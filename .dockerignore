@@ -1,0 +1,50 @@
+# ===================================================================
+# Docker Ignore - Employee Management System
+# ===================================================================
+
+# Git
+.git
+.gitignore
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.project
+.classpath
+.settings/
+*.swp
+
+# Build output
+target/
+
+# Maven wrapper (not needed in container, pom uses maven base image)
+.mvn/
+mvnw
+mvnw.cmd
+mvnw-dist.zip
+
+# Documentation
+README.md
+docs/
+
+# CI/CD files
+Jenkinsfile
+sonar-project.properties
+k8s/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+logs/
+*.log
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml

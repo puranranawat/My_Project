@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System - Console</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #161b2b;
+            --bg-tertiary: #1f263d;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --success-color: #10b981;
+            --success-hover: #059669;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --sidebar-width: 260px;
+            --border-radius: 16px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+
+        /* Sidebar styling */
+        aside {
+            width: var(--sidebar-width);
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 3rem;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-color), #a855f7);
+            padding: 0.5rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: var(--border-radius);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-primary);
+            background-color: var(--bg-tertiary);
+        }
+
+        .nav-item.active {
+            border-left: 4px solid var(--accent-color);
+            background: linear-gradient(to right, var(--bg-tertiary), rgba(99, 102, 241, 0.05));
+        }
+
+        .sidebar-footer {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+
+        .sidebar-footer .status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--success-color);
+            font-weight: 500;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-animation 1.5s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Main content layout */
+        main {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            padding: 2.5rem 3rem;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .header-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .header-title p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--text-primary);
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-tertiary);
+            transform: translateY(-2px);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-info h3 {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-info p {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .stat-icon {
+            background-color: var(--bg-tertiary);
+            padding: 0.85rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+        }
+
+        /* Content containers (pages) */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glassmorphism Panels */
+        .panel {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* Search input styling */
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            outline: none;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Premium table design */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 1rem 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-active {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .badge-inactive {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .badge-leave {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.35rem;
+            border-radius: 8px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .icon-btn:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .icon-btn-danger:hover {
+            color: var(--danger-color);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Form / Modal styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group-full {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 768px) {
+            .form-group-full {
+                grid-column: span 1;
+            }
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input, select, textarea {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 0.85rem 1rem;
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            outline: none;
+            transition: all var(--transition-speed) ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        /* Alert notifications */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideDown 0.4s ease;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Alert Container -->
+    <div id="alert-container" class="alert-container"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside>
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i data-lucide="shield-check" style="width: 24px; height: 24px; color: white;"></i>
+            </div>
+            <div class="logo-text">EMS DevSecOps</div>
+        </div>
+
+        <nav class="nav-links">
+            <div class="nav-item active" onclick="switchPage('employees')">
+                <i data-lucide="users" style="width: 18px; height: 18px;"></i>
+                Employees
+            </div>
+            <div class="nav-item" onclick="switchPage('departments')">
+                <i data-lucide="briefcase" style="width: 18px; height: 18px;"></i>
+                Departments
+            </div>
+            <div class="nav-item" onclick="switchPage('add-employee')">
+                <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+                New Employee
+            </div>
+            <div class="nav-item" onclick="switchPage('add-department')">
+                <i data-lucide="folder-plus" style="width: 18px; height: 18px;"></i>
+                New Department
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="status">
+                <span class="pulse"></span>
+                <span>Console Active</span>
+            </div>
+            <div>EMS Engine v1.0</div>
+            <div>Environment: dev-profile</div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+        <header>
+            <div class="header-title">
+                <h1 id="page-title">Employees Console</h1>
+                <p id="page-subtitle">View, search, and manage corporate employee directories</p>
+            </div>
+            <div class="quick-actions">
+                <button class="btn btn-secondary" onclick="refreshData()">
+                    <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                    Sync Data
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Employees</h3>
+                    <p id="stat-total-employees">0</p>
+                </div>
+                <div class="stat-icon">
+                    <i data-lucide="users" style="width: 24px; height: 24px;"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Departments</h3>
+                    <p id="stat-total-departments">0</p>
+                </div>
+                <div class="stat-icon">
+                    <i data-lucide="building" style="width: 24px; height: 24px;"></i>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Average Salary</h3>
+                    <p id="stat-avg-salary">$0.00</p>
+                </div>
+                <div class="stat-icon">
+                    <i data-lucide="dollar-sign" style="width: 24px; height: 24px;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Employees Page ==================== -->
+        <div id="page-employees" class="page active">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Employee Directory</div>
+                    <div class="search-container">
+                        <i data-lucide="search" class="search-icon" style="width: 16px; height: 16px;"></i>
+                        <input type="text" id="employee-search" class="search-input" placeholder="Search employees..." oninput="searchEmployees(this.value)">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Status</th>
+                                <th>Salary</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employees-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Departments Page ==================== -->
+        <div id="page-departments" class="page">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Active Corporate Departments</div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Department Name</th>
+                                <th>Description</th>
+                                <th>Employee Count</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="departments-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== Add Employee Page ==================== -->
+        <div id="page-add-employee" class="page">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Add New Employee Profile</div>
+                </div>
+
+                <form id="add-employee-form" onsubmit="handleCreateEmployee(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="emp-code">Employee Code *</label>
+                            <input type="text" id="emp-code" required placeholder="e.g. EMP101">
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-dept">Department *</label>
+                            <select id="emp-dept" required>
+                                <option value="">Select Department</option>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-firstname">First Name *</label>
+                            <input type="text" id="emp-firstname" required placeholder="John">
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-lastname">Last Name *</label>
+                            <input type="text" id="emp-lastname" required placeholder="Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-email">Email Address *</label>
+                            <input type="email" id="emp-email" required placeholder="john.doe@corporate.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-phone">Phone Number</label>
+                            <input type="text" id="emp-phone" placeholder="+1 (555) 019-2834">
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-gender">Gender *</label>
+                            <select id="emp-gender" required>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-dob">Date of Birth</label>
+                            <input type="date" id="emp-dob">
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-joining">Joining Date *</label>
+                            <input type="date" id="emp-joining" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-designation">Designation</label>
+                            <input type="text" id="emp-designation" placeholder="e.g. Staff Engineer">
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-salary">Monthly Salary ($)</label>
+                            <input type="number" step="0.01" id="emp-salary" placeholder="5000">
+                        </div>
+                        <div class="form-group">
+                            <label for="emp-status">Employment Status *</label>
+                            <select id="emp-status" required>
+                                <option value="ACTIVE">Active</option>
+                                <option value="INACTIVE">Inactive</option>
+                                <option value="ON_LEAVE">On Leave</option>
+                                <option value="TERMINATED">Terminated</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-fullactions" style="margin-top: 1.5rem;">
+                            <button type="submit" class="btn btn-primary">Create Employee Profile</button>
+                            <button type="reset" class="btn btn-secondary">Reset Fields</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== Add Department Page ==================== -->
+        <div id="page-add-department" class="page">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Add New Corporate Department</div>
+                </div>
+
+                <form id="add-department-form" onsubmit="handleCreateDepartment(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="dept-code">Department Code *</label>
+                            <input type="text" id="dept-code" required placeholder="e.g. HR, FIN, IT">
+                        </div>
+                        <div class="form-group">
+                            <label for="dept-name">Department Name *</label>
+                            <input type="text" id="dept-name" required placeholder="e.g. Human Resources">
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="dept-description">Description</label>
+                            <textarea id="dept-description" rows="4" placeholder="Brief outline of departmental operations..."></textarea>
+                        </div>
+
+                        <div class="form-group-fullactions" style="margin-top: 1.5rem;">
+                            <button type="submit" class="btn btn-primary">Create Department</button>
+                            <button type="reset" class="btn btn-secondary">Reset Fields</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- UI Scripts -->
+    <script>
+        // Set today's date in forms
+        document.getElementById('emp-joining').valueAsDate = new Date();
+
+        // Switch Page UI controller
+        function switchPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Remove active classes from navigation items
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+            // Show active page
+            document.getElementById(`page-${pageId}`).classList.add('active');
+
+            // Find matching nav menu and activate
+            const navItems = Array.from(document.querySelectorAll('.nav-item'));
+            const matchedNav = navItems.find(item => item.innerText.toLowerCase().includes(pageId.replace('add-', '')));
+            if (matchedNav) matchedNav.classList.add('active');
+
+            // Update Titles
+            const titleMap = {
+                'employees': { title: 'Employees Console', sub: 'View, search, and manage corporate employee directories' },
+                'departments': { title: 'Departments Console', sub: 'View and audit corporate departmental structure' },
+                'add-employee': { title: 'New Employee Profile', sub: 'Register a new employee resource to the system' },
+                'add-department': { title: 'New Department Profile', sub: 'Register a new business unit' }
+            };
+
+            if (titleMap[pageId]) {
+                document.getElementById('page-title').innerText = titleMap[pageId].title;
+                document.getElementById('page-subtitle').innerText = titleMap[pageId].sub;
+            }
+
+            // Custom triggers on load
+            if (pageId === 'employees' || pageId === 'add-employee') {
+                loadEmployees();
+                loadDepartments();
+            } else if (pageId === 'departments') {
+                loadDepartments();
+            }
+        }
+
+        // Notification Helper
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i data-lucide="${type === 'success' ? 'check-circle' : 'alert-circle'}" style="width: 18px; height: 18px;"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(alert);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => alert.remove(), 500);
+            }, 4000);
+        }
+
+        // Fetch API data wrapper
+        async function fetchAPI(url, options = {}) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.message || 'Server error occurred');
+                }
+                if (response.status === 204) return null;
+                return await response.json();
+            } catch (err) {
+                showNotification(err.message, 'danger');
+                throw err;
+            }
+        }
+
+        // Data Storage
+        let cachedEmployees = [];
+        let cachedDepartments = [];
+
+        // Load Employees
+        async function loadEmployees() {
+            const data = await fetchAPI('/api/employees');
+            if (data) {
+                cachedEmployees = data;
+                populateEmployeesTable(data);
+                updateStats();
+            }
+        }
+
+        // Load Departments
+        async function loadDepartments() {
+            const data = await fetchAPI('/api/departments');
+            if (data) {
+                cachedDepartments = data;
+                populateDepartmentsTable(data);
+                populateDepartmentDropdown(data);
+                updateStats();
+            }
+        }
+
+        // Populate Employees Table
+        function populateEmployeesTable(employees) {
+            const tbody = document.getElementById('employees-table-body');
+            tbody.innerHTML = '';
+
+            if (employees.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-secondary);">No employee profiles found.</td></tr>`;
+                return;
+            }
+
+            employees.forEach(emp => {
+                const statusBadge = getStatusBadge(emp.status);
+                const formattedSalary = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(emp.salary || 0);
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 600; color: var(--accent-color);">${emp.employeeCode}</td>
+                    <td>${emp.firstName} ${emp.lastName}</td>
+                    <td>${emp.email}</td>
+                    <td>${emp.departmentName || '<span style="color: var(--danger-color)">Unassigned</span>'}</td>
+                    <td>${emp.designation || 'N/A'}</td>
+                    <td>${statusBadge}</td>
+                    <td>${formattedSalary}</td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="icon-btn icon-btn-danger" onclick="deleteEmployee(${emp.id})" title="Delete Profile">
+                                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        // Populate Departments Table
+        function populateDepartmentsTable(departments) {
+            const tbody = document.getElementById('departments-table-body');
+            tbody.innerHTML = '';
+
+            if (departments.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No corporate departments defined.</td></tr>`;
+                return;
+            }
+
+            departments.forEach(dept => {
+                const formattedDate = new Date(dept.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 600; color: var(--accent-color);">${dept.departmentCode}</td>
+                    <td>${dept.departmentName}</td>
+                    <td>${dept.description || 'N/A'}</td>
+                    <td style="font-weight: 500;">${dept.employeeCount}</td>
+                    <td>${formattedDate}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        // Dropdown populator for department select list
+        function populateDepartmentDropdown(departments) {
+            const dropdown = document.getElementById('emp-dept');
+            // Keep the default option
+            dropdown.innerHTML = '<option value="">Select Department</option>';
+
+            departments.forEach(dept => {
+                const opt = document.createElement('option');
+                opt.value = dept.id;
+                opt.text = `${dept.departmentName} (${dept.departmentCode})`;
+                dropdown.appendChild(opt);
+            });
+        }
+
+        // Status Badge Helper
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'ACTIVE': return `<span class="badge badge-active">Active</span>`;
+                case 'INACTIVE': return `<span class="badge badge-inactive">Inactive</span>`;
+                case 'ON_LEAVE': return `<span class="badge badge-leave">On Leave</span>`;
+                default: return `<span class="badge">${status}</span>`;
+            }
+        }
+
+        // Stats Updates
+        function updateStats() {
+            document.getElementById('stat-total-employees').innerText = cachedEmployees.length;
+            document.getElementById('stat-total-departments').innerText = cachedDepartments.length;
+
+            const salaries = cachedEmployees.map(e => e.salary).filter(s => s > 0);
+            const totalSalary = salaries.reduce((acc, curr) => acc + curr, 0);
+            const avgSalary = salaries.length > 0 ? (totalSalary / salaries.length) : 0;
+            
+            document.getElementById('stat-avg-salary').innerText = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(avgSalary);
+        }
+
+        // Search action
+        async function searchEmployees(keyword) {
+            if (!keyword.trim()) {
+                populateEmployeesTable(cachedEmployees);
+                return;
+            }
+            const data = await fetchAPI(`/api/employees/search?keyword=${encodeURIComponent(keyword)}`);
+            if (data) {
+                populateEmployeesTable(data);
+            }
+        }
+
+        // Delete action
+        async function deleteEmployee(id) {
+            if (confirm("Are you sure you want to delete this employee profile? This action is irreversible.")) {
+                await fetchAPI(`/api/employees/${id}`, { method: 'DELETE' });
+                showNotification("Employee profile successfully deleted");
+                loadEmployees();
+            }
+        }
+
+        // Create Employee
+        async function handleCreateEmployee(event) {
+            event.preventDefault();
+            const requestBody = {
+                employeeCode: document.getElementById('emp-code').value,
+                departmentId: parseInt(document.getElementById('emp-dept').value),
+                firstName: document.getElementById('emp-firstname').value,
+                lastName: document.getElementById('emp-lastname').value,
+                email: document.getElementById('emp-email').value,
+                phone: document.getElementById('emp-phone').value,
+                gender: document.getElementById('emp-gender').value,
+                dateOfBirth: document.getElementById('emp-dob').value || null,
+                joiningDate: document.getElementById('emp-joining').value,
+                designation: document.getElementById('emp-designation').value,
+                salary: parseFloat(document.getElementById('emp-salary').value) || null,
+                status: document.getElementById('emp-status').value
+            };
+
+            const response = await fetchAPI('/api/employees', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (response) {
+                showNotification("Employee profile successfully registered!");
+                document.getElementById('add-employee-form').reset();
+                document.getElementById('emp-joining').valueAsDate = new Date();
+                switchPage('employees');
+            }
+        }
+
+        // Create Department
+        async function handleCreateDepartment(event) {
+            event.preventDefault();
+            const requestBody = {
+                departmentCode: document.getElementById('dept-code').value,
+                departmentName: document.getElementById('dept-name').value,
+                description: document.getElementById('dept-description').value
+            };
+
+            const response = await fetchAPI('/api/departments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (response) {
+                showNotification("Corporate department successfully registered!");
+                document.getElementById('add-department-form').reset();
+                switchPage('departments');
+            }
+        }
+
+        // Refresh action
+        function refreshData() {
+            loadEmployees();
+            loadDepartments();
+            showNotification("Data synchronized successfully!");
+        }
+
+        // Initial Data Load
+        loadEmployees();
+        loadDepartments();
+        lucide.createIcons();
+    </script>
+</body>
+</html>
